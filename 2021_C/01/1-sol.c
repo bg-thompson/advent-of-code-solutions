@@ -3,7 +3,7 @@
 // The question is available at:
 // https://adventofcode.com/2021/day/1
 //
-// Author:   Benjamin Thompson
+// Author:   Benjamin Thompson (github: bg-thompson)
 // Email:    bgt37@cornell.edu
 // Created:  2021.12.01
 //
