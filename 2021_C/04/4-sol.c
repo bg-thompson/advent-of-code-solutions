@@ -15,7 +15,7 @@
 #include <string.h>
 
 #define DATAFILE_NAME "4.txt"
-//#define DATAFILE_NAME "test4.txt" // Returned 4512, this was correct.
+//#define DATAFILE_NAME "test4.txt" // Returned 4512 for Pt1 testing, this was correct.
 #define DATA_ROWS 601
 
 struct board
@@ -109,6 +109,27 @@ int main() {
 	// Print solution for Pt 1
 	printf("board score: %d\n", sum_unmarked * random_nums[min_bingo_index]);
 	// Powershell returned 2496, this was correct.
+	//
+	// Pt 2:
+	// Select board with lowest score, and calculate score.
+	// We just copied the above code (lines 95-110), and made the appropriate modifications:
+	int lose_index = 0;
+	int max_bingo_index = 0;
+	for (int i = 0; i < n_boards; i++){	
+		if (boards[i].bingo_index > max_bingo_index) {
+			max_bingo_index = boards[i].bingo_index;
+			lose_index = i;
+		}
+	}
+	sum_unmarked = 0;
+	for (int i = 0; i < 5; i++) {
+		for (int j = 0; j < 5; j++) {
+			sum_unmarked += (boards[lose_index].indexes[i][j] > max_bingo_index ? boards[lose_index].numbers[i][j] : 0);
+		}
+	}
+	// Print solution for Pt 2
+	printf("board score (worst): %d\n", sum_unmarked * random_nums[max_bingo_index]);
+	// Console printed 25925, this was correct.
 	return 0;
 }	
 
