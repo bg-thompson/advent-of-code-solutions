@@ -47,11 +47,17 @@ import t "core:time"
 //EXAMPLE_DATA :: `EE00D40C823060`
 // This corresponds to [7,3,3,[2,4,1],[4,4,2],[1,4,3]], parsed correctly.
 
-EXAMPLE_DATA :: `620080001611562C8802118E34`
+//EXAMPLE_DATA :: `620080001611562C8802118E34`
 // This corresponds to [3,0,2,[0,0,22,[0,4,10],[5,4,11]],[1,0,2,[0,4,12],[3,4,13]]], parsed correctly.
 
 //EXAMPLE_DATA :: `A0016C880162017C3686B18A3D4780`
 // This has a version sum of 31, this agreed with the value on the website.
+
+
+//EXAMPLE_DATA :: `9C0141080250320F1802104A08`
+// This represents 1 + 3 == 2 * 2. This evaluated to 1, as expected.
+EXAMPLE_DATA :: `CE00C43D881120`
+// This finds the max of 7,8,9. It evaluated to 9, as expected.
 
 BYTE_ARR_UPPER_BOUND :: 8000
 
@@ -61,7 +67,7 @@ Packet :: union { Num_pack, Op_n_pack, Op_l_pack }
 Num_pack :: struct {
 	version : u8,
 	type    : u8, // Always 4.
-	number  : u32,
+	number  : u64,
 }
 
 Op_n_pack  :: struct {
@@ -93,19 +99,17 @@ parsepack_n :: proc ( bytes : [] u8 )  -> ( pack : Num_pack, length : u16 ) {
 	n_grps := 1
 	// Find number of 3-digit groups.
 	for bytes[temp_i] == 1 {
-		// f.println("num grps: ", bytes[temp_i:temp_i+5]) // debug
 		n_grps += 1
 		temp_i += 5
 	}
-	// f.println("num grps: ", bytes[temp_i:temp_i+5]) // debug
 	// Calculate number.
-	temp_n := u32(0)
-	mult := u32(1)
+	temp_n := u64(0)
+	mult := u64(1)
 	for g in 0..n_grps - 1 {
-		temp_n += mult*8*u32(bytes[6 + (n_grps - 1 - g)*5 + 1] )
-		temp_n += mult*4*u32(bytes[6 + (n_grps - 1 - g)*5 + 2] )
-		temp_n += mult*2*u32(bytes[6 + (n_grps - 1 - g)*5 + 3] )
-		temp_n += mult*1*u32(bytes[6 + (n_grps - 1 - g)*5 + 4] )
+		temp_n += mult*8*u64(bytes[6 + (n_grps - 1 - g)*5 + 1] )
+		temp_n += mult*4*u64(bytes[6 + (n_grps - 1 - g)*5 + 2] )
+		temp_n += mult*2*u64(bytes[6 + (n_grps - 1 - g)*5 + 3] )
+		temp_n += mult*1*u64(bytes[6 + (n_grps - 1 - g)*5 + 4] )
 		mult *= 16
 	}
 	pack.number = temp_n
@@ -145,7 +149,6 @@ parsepacket :: proc( bytes : [] u8 ) -> ( pack : Packet, length : u16) {
 				ret.l_packs = bit_length
 				// Parse content of packet
 				//f.println("Found Op_l packet: ", ret) // debug
-				//f.println("Parsing content...") // debug
 				subbits := bytes[6 + 1 + 15:]
 				curr_subbit := u16(0)
 				for curr_subbit < bit_length {
@@ -172,7 +175,6 @@ parsepacket :: proc( bytes : [] u8 ) -> ( pack : Packet, length : u16) {
 				ret.n_packs = bit_number
 				// Parse content of packet.
 				//f.println("Found Op_n packet: ", ret) // debug
-				//f.println("Parsing content...") // debug
 				subbits := bytes[6 + 1 + 11:]
 				curr_subpacket := u16(0)
 				curr_subbit    := u16(0)
@@ -251,7 +253,6 @@ main :: proc() {
 			binData[4*i + j] = bits[j]
 		}
 	}
-	//f.println(hex_str) // debug
 	prop_packet, prop_length := parsepacket(binData[:])
 	// Pt 1: Sum up version numbers in packet.
 	version_sum :: proc ( p : Packet ) -> (sum : int) {
@@ -275,6 +276,56 @@ main :: proc() {
 		// Version sum:  901
 		// Time:  6.0462ms
 	// This was correct!
+	// Pt 2
+	// Evaluate the value of a packet using:
+	// 0,1,2,3 : sum, product, min, max
+	// 5,6,7   : > , < , ==
+	evaluate :: proc ( p : Packet ) -> ( value : u64 ) {
+		op : u8
+		subpackets : [] Packet
+		switch in p {
+			case Num_pack:
+				value = p.(Num_pack).number
+				return value
+			case Op_n_pack:
+				op = p.(Op_n_pack).type
+				subpackets = p.(Op_n_pack).packets
+			case Op_l_pack:
+				op = p.(Op_l_pack).type
+				subpackets = p.(Op_l_pack).packets
+		}
+		switch op {
+			case 0: // Sum
+				for sub in subpackets { value += evaluate(sub) }
+			case 1: // Prod
+				value = 1
+				for sub in subpackets { value *= evaluate(sub) }
+			case 2: // Min
+				value = max(u64)
+				for sub in subpackets {
+					temp := evaluate(sub)
+					if temp < value { value = temp }
+				}
+			case 3: // Max
+				value = min(u64)
+				for sub in subpackets {
+					temp := evaluate(sub)
+					if temp > value { value = temp }
+				}
+			case 5: // >
+				value = u64(evaluate(subpackets[0]) > evaluate(subpackets[1]))
+			case 6: // <
+				value = u64(evaluate(subpackets[0]) < evaluate(subpackets[1]))
+			case 7: // ==
+				value = u64(evaluate(subpackets[0]) == evaluate(subpackets[1]))
+		}
+		return value
+	}
+	f.println("Packet value: ", evaluate(prop_packet))
+	// The command "odin run 16-sol.odin -define:file=1" was run, cmder printed
+		// Packet value:  110434737925
+		// Time:  0s
+	// This was correct.
 }
 
 
