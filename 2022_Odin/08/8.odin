@@ -3,6 +3,7 @@ package aoc22
 import f "core:fmt"
 import s "core:strings"
 import v "core:strconv"
+import   "core:time"
 
 when ODIN_DEBUG {
     FILENAME :: `test.txt`
@@ -18,8 +19,8 @@ when ODIN_DEBUG {
     DIMS :: [2] int {99,99}
 }
 
-GridTree : [DIMS.y][DIMS.x] u8
-GridVis  : [DIMS.y][DIMS.x] u8
+GridTree : [DIMS.y][DIMS.x] i8
+GridVis  : [DIMS.y][DIMS.x] i8
 
 main :: proc() {
     // Load data into grid.
@@ -28,19 +29,25 @@ main :: proc() {
     for l, i in lines {
 	if l == "" { continue }
 	for n, j in l {
-	    num := u8(n - '0')
-	    GridTree[i][j] = u8(num)
+	    num := i8(n - '0')
+	    GridTree[i][j] = i8(num)
 	}
     }
     when ODIN_DEBUG { for l in GridTree { f.println(l) } }
     f.println("")
     when ODIN_DEBUG { for l in rotate_grid_pi_2(GridTree) { f.println(l) } }
     f.println("")
+    s1 := time.now()
     sol1 := pt1()
+    e1 := time.now()
     f.println("Pt1 Solution:", sol1)
+    f.println("Pt1 Time:", time.diff(s1, e1))
     // Returned 1789, answer was correct.
+    s2   := time.now()
     sol2 := pt2()
+    e2   := time.now()
     f.println("Pt2 Solution:", sol2)
+    f.println("Pt2 Time:", time.diff(s2, e2))
     // Returned 314820, answer was correct.
 }
 
@@ -52,6 +59,17 @@ rotate_grid_pi_2 :: proc (orig : [$N] [$M] $T ) -> ( rot : [M] [N] T) {
 }
 
 pt1 :: proc() -> int {
+    // Copied from main for use in timing test.
+    lines := s.split_lines(FILE)
+    assert(len(lines[0]) == int(DIMS.x))
+    for l, i in lines {
+	if l == "" { continue }
+	for n, j in l {
+	    num := i8(n - '0')
+	    GridTree[i][j] = i8(num)
+	}
+    }
+    
     grid := GridTree
     vis := visible_from_left(grid, GridVis)
     when ODIN_DEBUG {
@@ -79,20 +97,22 @@ pt1 :: proc() -> int {
     return visible_trees
 }
 
-// Not optimized, but since Odin is compiled we'll be fine.
-visible_from_left :: proc( grid : [$N][$M] u8, old_vis : [N][M] u8 ) -> ( new_vis : [N][M] u8 ) {
+visible_from_left :: proc( grid : [$N][$M] i8, old_vis : [N][M] i8 ) -> ( new_vis : [N][M] i8 ) {
     // Copy data.
     new_vis = old_vis
-    // Going L to R, T to B, determine if a tree is visible from above.
+    // Going T to B, determine if a tree is visible from left.
+    // Stop if tree has height 9. //@optimization 9 can be generalized.
     l1: for y in 0..=N-1 {
+	cmh := i8(-1)
 	l2: for x in 0..=M-1 {
-	    tree := grid[y][x]
-	    l3: for o in 0..=x {
-		if o == x { continue }
-		if grid[y][o] >= tree { continue l2 }
+	    treeh := grid[y][x]
+	    if treeh > cmh {
+		new_vis[y][x] = 1
+		cmh = treeh
+		if treeh == 9 {
+		    continue l1
+		}
 	    }
-	    // If ip reaches here, tree visible.
-	    new_vis[y][x] = 1
 	}
     }
     return
@@ -100,16 +120,14 @@ visible_from_left :: proc( grid : [$N][$M] u8, old_vis : [N][M] u8 ) -> ( new_vi
 
 pt2 :: proc() -> int {
     GridVd : [DIMS.y][DIMS.x] int
-    for i in 0..=DIMS.y-1 {
-	for j in 0..=DIMS.x-1 { GridVd = 1 }
-    }
+    GridVd = 1
     grid := GridTree
     vd   := GridVd
     
     vd = viewing_distance_left(grid, vd)
     when ODIN_DEBUG {
 	f.println("Vd1:")
-	for l in GridVd { f.println(l) }
+	for l in vd { f.println(l) }
 	f.println("")
     }
 
@@ -135,23 +153,24 @@ pt2 :: proc() -> int {
     return max_scenic
 }
 
-viewing_distance_left :: proc( grid : [$N][$M] u8, vd_old : [N][M] int) -> ( vd_new : [N][M] int ) {
-    vd_new = vd_old
+viewing_distance_left :: proc( grid : [$N][$M] i8, vd_old : [N][M] int) -> ( vd_new : [N][M] int ) {
+//    vd_new = vd_old
     // Going L to R, T to B, determine the vd from a tree looking left.
     l1: for y in 0..=N-1 {
-	l2: for x in 0..=M-1 {
-	    th := grid[y][x]
-	    cvd := 0
-	    l3: for o in 0..=x {
-		if o == 0 { continue }
-		cvd += 1
-		if grid[y][x-o] >= th {
-		    vd_new[y][x] *= cvd
-		    continue l2
-		}
+	// Initialize blocker-index row.
+	blocker_indexes : [10] int
+	blocker_indexes = 0
+	// blocker_indexes[i] contains the nearest x-index of a tree
+	// which will block a tree of height i.
+	for x in 0..=M-1 {
+	    tree_height   := int(grid[y][x])
+	    blocker_index := blocker_indexes[tree_height]
+	    vd_new[y][x] = (x - blocker_index) * vd_old[y][x]
+	    // Update blocker indexes.
+	    for b in 0..=tree_height {
+		blocker_indexes[b] = x
 	    }
-	    vd_new[y][x] *= cvd
 	}
     }
-    return		
+    return
 }
