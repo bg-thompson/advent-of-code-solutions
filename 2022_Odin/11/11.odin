@@ -16,7 +16,7 @@ main :: proc() {
     
     f.println("Pt1 Sol:", sol1)
     f.println("Pt1 Time:", time.diff(t1,t2))
-    // Returned 182293 in 1.76ms, answer was correct.
+    // Returned 182293 in 0.150ms, answer was correct.
 
     t3 := time.now()
     when ODIN_DEBUG {
@@ -27,7 +27,7 @@ main :: proc() {
     t4 := time.now()
     f.println("Pt2 Sol:", sol2)
     f.println("Pt2 Time:", time.diff(t3,t4))
-    // Returned 54832778815 in 8.78 ms, answer was correct.
+    // Returned 54832778815 in 6.46 ms, answer was correct.
 }
 
 // 4 loads of copypasta below, and no one cares.
@@ -88,10 +88,10 @@ pt1_test :: proc() -> int {
 	    }
 	    clear(testm_list[mn])
 	}
-	f.println(testm_inspections)
+//	f.println(testm_inspections)
     }
-    f.println("Luggage after its:", testm0,testm1,testm2,testm3)
-    f.println("Number of inspections:", testm_inspections)
+//    f.println("Luggage after its:", testm0,testm1,testm2,testm3)
+//    f.println("Number of inspections:", testm_inspections)
     // Calculate product of largest 2.
     largest1 := 0
     largest2 := 0
@@ -104,7 +104,7 @@ pt1_test :: proc() -> int {
 	    largest2 = number
 	}
     }
-    f.println("Largest two values:", largest1, largest2)
+  //  f.println("Largest two values:", largest1, largest2)
     return largest1 * largest2
 }
 
@@ -187,9 +187,9 @@ pt1 :: proc() -> int {
 	    clear(m_list[mn])
 	}
     }
-    f.println("Luggage after its:")
-    for mp in m_list { f.println(mp) }
-    f.println("Number of inspections:", m_inspections)
+//    f.println("Luggage after its:")
+//    for mp in m_list { f.println(mp) }
+//    f.println("Number of inspections:", m_inspections)
     // Calculate product of largest 2.
     largest1 := 0
     largest2 := 0
@@ -265,8 +265,8 @@ pt2_test :: proc() -> int {
 	    clear(testm_list[mn])
 	}
     }
-    f.println("Luggage after its:", testm0,testm1,testm2,testm3)
-    f.println("Number of inspections after", ITERATIONS, "rounds:", testm_inspections)
+//    f.println("Luggage after its:", testm0,testm1,testm2,testm3)
+//    f.println("Number of inspections after", ITERATIONS, "rounds:", testm_inspections)
     // Calculate product of largest 2.
     largest1 := 0
     largest2 := 0
@@ -279,7 +279,7 @@ pt2_test :: proc() -> int {
 	    largest2 = number
 	}
     }
-    f.println("Largest two values:", largest1, largest2) 
+//    f.println("Largest two values:", largest1, largest2) 
    return largest1 * largest2
 }
 
@@ -363,9 +363,9 @@ pt2 :: proc() -> int {
 	    clear(m_list[mn])
 	}
     }
-    f.println("Luggage after its:")
-    for mp in m_list { f.println(mp) }
-    f.println("Number of inspections:", m_inspections)
+//    f.println("Luggage after its:")
+//    for mp in m_list { f.println(mp) }
+//    f.println("Number of inspections:", m_inspections)
     // Calculate product of largest 2.
     largest1 := 0
     largest2 := 0
@@ -378,6 +378,6 @@ pt2 :: proc() -> int {
 	    largest2 = number
 	}
     }
-    f.println("Largest two values:", largest1, largest2)
+//    f.println("Largest two values:", largest1, largest2)
     return largest1 * largest2
 }
