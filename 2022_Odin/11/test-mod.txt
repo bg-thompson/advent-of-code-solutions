@@ -1,0 +1,20 @@
+testm0 : [dynamic] int
+testm1 : [dynamic] int
+testm2 : [dynamic] int
+testm3 : [dynamic] int
+
+append(&testm0, 79, 98)
+testm0f :: proc(x : int) -> int { return x * 19 }
+testm0throws  :: [3] int {23,2,3}
+
+append(&testm1, 54, 65, 75, 74)
+testm1f :: proc(x : int) -> int { return x + 6 }
+testm1throws :: [3] int {19,2,0}
+
+append(&testm2, 79, 60, 97)
+testm2f :: proc(x : int) -> int { return x * x}
+testm2throws :: [3] int {13,1,3}
+
+append(&testm3, 74)
+testm3f :: proc(x : int) -> int { return x + 3 }
+testm3throws :: [3] int {17,0,1}
