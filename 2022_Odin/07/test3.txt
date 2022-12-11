@@ -1,0 +1,30 @@
+$ cd /
+$ ls
+dir a
+dir b
+290229 1.txt
+dir c
+dir d
+dir e
+dir f
+dir g
+dir h
+$ cd a
+$ ls
+170937 2.txt
+281758 3.txt
+109017 4.txt
+295735 5.txt
+$ cd ..
+$ cd b
+$ ls
+273438 2.txt
+dir i
+dir j
+211769 6.txt
+205895 7.txt
+$ cd i
+$ ls
+4635 8.txt
+$ cd ..
+$ cd j
