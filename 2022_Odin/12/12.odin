@@ -58,6 +58,7 @@ main :: proc() {
     f.println("Pt1 Sol:", sol1)
     // Returned 468, answer was correct.
     f.println("Pt1 Time:", time.diff(t1,t2))
+    // Returned 109us
 
     t3 := time.now()
     min_path_from_a := gridh * gridw
@@ -68,7 +69,9 @@ main :: proc() {
     }
     t4 := time.now()
     f.println("Pt2 Sol:", min_path_from_a)
+    // Returned 459, answer was correct.
     f.println("Pt2 Time:", time.diff(t3,t4))
+    // Returned 13ms
 }
 
 length_min_path :: proc(starting_pos : int) -> int {
