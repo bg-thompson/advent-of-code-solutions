@@ -24,7 +24,7 @@ main :: proc() {
     f.println("Pt2 Sol:", sol1 - sol2)
     // Returned 2554, answer was correct.
     f.println("Pt2 Time:", time.diff(t3,t4))
-    // Returned 725us.
+    // Returned 708us.
 }
 
 DL :: 22
@@ -64,10 +64,7 @@ pt1 :: proc() -> int {
 }
 
 pt2 :: proc() -> int {
-    // Process data, and calculate bounds of droplet.
-    maxx, maxy, maxz := 0,0,0
-    minx, miny, minz := DL, DL, DL
-    
+    // Process data.
     lines := s.split_lines(FILE)
     nlines := len(lines) - 1
     data := make([] [3] int, nlines)
@@ -77,22 +74,8 @@ pt2 :: proc() -> int {
 	    n, ok := v.parse_int(str)
 	    assert(ok && n < DL)
 	    data[i][j] = n
-	    switch j {
-		case 0:
-		minx = n < minx ? n : minx
-		maxx = n > maxx ? n : maxx
-	    case 1:
-		miny = n < miny ? n : miny
-		maxy = n > maxy ? n : maxy
-	    case 2:
-		minz = n < minz ? n : minz
-		maxz = n > maxz ? n : maxz
-		case:
-		assert(false)
-	    }
 	}
     }
-    if ODIN_DEBUG { f.println("min/max x, y z:", minx, maxx, miny, maxy, minz, maxz) }
 
     // Create bool cube with i8 and buffer, and fill with data.
     cube := make([] i8, (DL + 2)*(DL + 2)*(DL + 2))
