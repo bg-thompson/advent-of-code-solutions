@@ -24,10 +24,10 @@ main :: proc() {
     f.println("Pt2 Sol:", sol1 - sol2)
     // Returned 2554, answer was correct.
     f.println("Pt2 Time:", time.diff(t3,t4))
-    // Returned 993us.
+    // Returned 725us.
 }
 
-DL :: 30
+DL :: 22
 
 pt1 :: proc() -> int {
     // Process data
