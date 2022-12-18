@@ -27,7 +27,8 @@ main :: proc() {
     // Returned 708us.
 }
 
-DL :: 22
+DL  :: 22
+DLB :: DL + 2
 
 pt1 :: proc() -> int {
     // Process data
@@ -46,15 +47,15 @@ pt1 :: proc() -> int {
 		      f.println(data) }
     
     // Create bool cube with i8 and buffer, and fill with data.
-    cube := make([] i8, (DL + 2)*(DL + 2)*(DL + 2))
+    cube := make([] i8, DLB*DLB*DLB)
     for d in data {
 
-	cube[d.x + 1 + (d.y + 1)*(DL + 2) + (d.z + 1)*(DL + 2)*(DL + 2)] = 1
+	cube[d.x + 1 + (d.y + 1)*DLB + (d.z + 1)*DLB*DLB] = 1
     }
     total_hidden_faces := 0
-    adjacents :: [6] int { -1, 1, -(DL + 2), (DL + 2), (DL + 2)*(DL + 2), -(DL + 2)*(DL + 2) }
+    adjacents :: [6] int { -1, 1, -DLB, DLB, DLB*DLB, -DLB*DLB }
     for d in data {
-	pos := d.x + 1 + (d.y + 1)*(DL + 2) + (d.z + 1)*(DL + 2)*(DL + 2)
+	pos := d.x + 1 + (d.y + 1)*DLB + (d.z + 1)*DLB*DLB
 	for adj in adjacents {
 	    total_hidden_faces += int(cube[pos + adj])
 	}
@@ -78,8 +79,8 @@ pt2 :: proc() -> int {
     }
 
     // Create bool cube with i8 and buffer, and fill with data.
-    cube := make([] i8, (DL + 2)*(DL + 2)*(DL + 2))
-    for d in data { cube[d.x + 1 + (d.y + 1)*(DL + 2) + (d.z + 1)*(DL + 2)*(DL + 2)] = 1 }
+    cube := make([] i8, DLB*DLB*DLB)
+    for d in data { cube[d.x + 1 + (d.y + 1)*DLB + (d.z + 1)*DLB*DLB] = 1 }
 
     // Do breath-first search on the exterior,
     // the only entries left with 0 will be air pockets.
@@ -89,15 +90,15 @@ pt2 :: proc() -> int {
     append(&boundaryo, [3]int{0,0,0})
     cube[0] = 1
     
-    adjacents :: [6] int { -1, 1, -(DL + 2), (DL + 2), (DL + 2)*(DL + 2), -(DL + 2)*(DL + 2) }
+    adjacents :: [6] int { -1, 1, -DLB, DLB, DLB*DLB, -DLB*DLB }
     
     for len(boundaryo) != 0 {
 	for p in boundaryo {
 	    for i in 0..=2 {
 		if p[i] - 1 >= 0 {
-		    offset := i == 2 ? -(DL + 2)*(DL + 2) : -i*(DL + 2) + (i-1)
-		    if cube[p.x + p.y*(DL + 2) + p.z*(DL + 2)*(DL + 2) + offset] == 0 {
-			cube[p.x + p.y*(DL + 2) + p.z*(DL + 2)*(DL + 2) + offset] = 1
+		    offset := i == 2 ? -DLB*DLB : -i*DLB + (i-1)
+		    if cube[p.x + p.y*DLB + p.z*DLB*DLB + offset] == 0 {
+			cube[p.x + p.y*DLB + p.z*DLB*DLB + offset] = 1
 			switch i {
 			case 0:
 			    append(&boundaryn, [3]int{p.x - 1, p.y, p.z})
@@ -109,9 +110,9 @@ pt2 :: proc() -> int {
 		    }
 		}
 		if p[i] + 1 < DL + 2 {
-		    offset := i == 2 ? (DL + 2)*(DL + 2) : i*(DL + 2) + (1-i)
-		    if cube[p.x + p.y*(DL + 2) + p.z*(DL + 2)*(DL + 2) + offset] == 0 {
-			cube[p.x + p.y*(DL + 2) + p.z*(DL + 2)*(DL + 2) + offset] = 1
+		    offset := i == 2 ? DLB*DLB : i*DLB + (1-i)
+		    if cube[p.x + p.y*DLB + p.z*DLB*DLB + offset] == 0 {
+			cube[p.x + p.y*DLB + p.z*DLB*DLB + offset] = 1
 			switch i {
 			case 0:
 			    append(&boundaryn, [3]int{p.x + 1, p.y, p.z})
