@@ -2,6 +2,9 @@
 
 Here are my solutions to the (annual) Advent of Code challenges.
 
+## 2023 (Zig)
+All solutions are in Zig, self-contained, and use only the std library.
+
 ## 2022 (Odin)
 All solutions are in Odin, self-contained, and use only a small collection of core libraries.
 
