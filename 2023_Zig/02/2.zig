@@ -15,12 +15,16 @@ const dprint  = std.debug.print;
 const dassert = std.debug.assert;
 
 pub fn main() void {
-    // Pt1.
+    // Pt1, Pt2
     var pt1_solution : u32 = 0;
+    var pt2_solution : u32 = 0;
     var line_iter = std.mem.tokenizeAny(u8, data, "\n");
     var line_index : u32 = 0;
     while (line_iter.next()) |line| : (line_index += 1) {
         var game_possible = true;
+        var max_red   : u32 = 0;
+        var max_green : u32 = 0;
+        var max_blue  : u32 = 0;
         var pair_iter = std.mem.tokenizeAny(u8, line, ";:,");
         var pair_index : u32 = 0;
         while (pair_iter.next()) |seg| : (pair_index += 1) {
@@ -38,9 +42,18 @@ pub fn main() void {
                 } else {
                     // Add in switch.
                     switch (token[0]) {
-                        'r' => game_possible = game_possible and ball_number <= 12,
-                        'g' => game_possible = game_possible and ball_number <= 13,
-                        'b' => game_possible = game_possible and ball_number <= 14,
+                        'r' => {
+                            game_possible = game_possible and ball_number <= 12;
+                            max_red = @max(max_red, ball_number);
+                        },
+                        'g' => {
+                            game_possible = game_possible and ball_number <= 13;
+                            max_green = @max(max_green, ball_number);
+                        },
+                        'b' => {
+                            game_possible = game_possible and ball_number <= 14;
+                            max_blue = @max(max_blue, ball_number);
+                        },
                         else => unreachable,
                     }
                 }
@@ -51,9 +64,13 @@ pub fn main() void {
         if (game_possible) {
             pt1_solution += line_index + 1;
         }
+        const game_product = max_red * max_green * max_blue;
+        pt2_solution += game_product;
         dprint("Game outcome possible:{}\n",  .{game_possible});
+        dprint("Game prod:{}\n", .{game_product});
     }
     dprint("Pt1 sol:{}\n", .{pt1_solution});
     // Output: 2156 (correct).
-    
+    dprint("Pt2 sol:{}\n", .{pt2_solution});
+    // Output: 66909 (correct).
 }
