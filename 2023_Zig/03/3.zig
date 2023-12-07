@@ -1,3 +1,5 @@
+// Disclaimer: At the time of writing, my experience with Zig is basically 0.
+// The aim of solving these problems is to provide myself with an introduction to Zig.
 const std = @import("std");
 
 const dprint  = std.debug.print;
